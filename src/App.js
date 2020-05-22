@@ -2,34 +2,16 @@ import React, {useState, useEffect} from "react";
 import Home from './components/Home'
 import Form from './components/Form'
 import {Route, Switch, Link} from 'react-router-dom'
-import {v4 as uuid} from 'uuid'
+import axios from 'axios'
 import * as yup from 'yup'
 import formSchema from './validation/formSchema'
 
-const initialOrder = [
-  {
-    id: uuid(),
-    name:'Virginia',
-    size:'small',
-    toppings:[
-      "pepperoni",
-      "blackOlives",
-      "sausage",
-      "greenChile",
-    ],
-    substitute: false,
-    instructions: ''
-  }
 
-]
 
-function fetchOrder(){
-  return Promise.resolve({success:true, initialOrder})
-}
 
 const initialFormValues = {
   //text input
-  name: '',
+  first_name: '',
   //dropdown
   size:'',
 
@@ -47,25 +29,50 @@ const initialFormValues = {
 }
 
 const initialFormErrors = {
-  name:'',
+  first_name:'',
+  size:'',
+  instructions:'',
 }
 const initialDisabled = true 
 
 const App = () => {
 
-  const[order, setOrder]=useState(initialOrder)
+  const[orders, setOrders]=useState([])
   const[formValues, setFormValues]= useState(initialFormValues)
   const [formErrors, setFormErrors] = useState(initialFormErrors)
   const [disabled, setDisabled] = useState(initialDisabled)
   
+  const getOrders = () => {
+    axios.get('https://reqres.in/api/users')
+      .then(res => {
+        console.log(res)
+        setOrders(res.data.data)
+      })
+      .catch(err => {
+        console.log(err)  
+      })
+  }
 
-  useEffect(() => {
-    fetchOrder().then(res => setOrder(res.initialOrder))
-  })
+  const postNewOrder = newOrder => {
+    axios.post('https://reqres.in/api/users', newOrder)
+      .then(res => {
+        console.log(orders, res.data)
+        setOrders([...orders, res.data])
+      })
+      .catch(err => {
+        console.log('post is broken')
+      })
+      .finally(() => {
+        setFormValues(initialFormValues)
+      })
+  }
+
+
+ 
 
   const onInputChange = evt => {
-    const {name} = evt.target.name
-    const {value} = evt.target.value
+    const name = evt.target.name
+    const value = evt.target.value
 
     yup 
       .reach(formSchema, name)
@@ -82,8 +89,12 @@ const App = () => {
           [name]: err.errors[0]
         })
       })
-    setFormValues({...formValues, [name]: value})
+    setFormValues({
+      ...formValues, 
+      [name]: value
+    })
   }
+
   const onCheckboxChange = evt => {
     const {name} = evt.target
     const {checked} = evt.target
@@ -99,14 +110,22 @@ const App = () => {
   
   const onSubmit = evt => {
     evt.preventDefault()
+
     const newOrder = {
-      name: formValues.name.trim(),
+      first_name: formValues.first_name.trim(),
       size: formValues.size,
       toppings: Object.keys(formValues.toppings)
-        .filter(topping => formValues.toppings[topping] === true)
+        .filter(topping => formValues.toppings[topping] === true),
+      instructions: formValues.instructions.trim()
     }
-    //postNewOrder(newOrder)
+
+    postNewOrder(newOrder)
+    console.log(newOrder)
   }
+
+  useEffect(() => {
+    getOrders()
+  },[])
 
 
   useEffect(() => {
@@ -115,6 +134,8 @@ const App = () => {
         setDisabled(!valid)
       })
   },[formValues])
+
+
   return (
     <div className="App">
       <header className="App Header">
@@ -133,12 +154,21 @@ const App = () => {
             onSubmit={onSubmit}
             errors={formErrors}
             disabled={disabled}
-            />
+          />
         </Route>
         <Route path='/'>
           <Home />
         </Route>
       </Switch>
+      {
+        orders.map(order =>{
+          return (
+            <div key={order.id} className='order container'>
+              <h4>{order.first_name}</h4>
+            </div>
+          )
+        })
+      }
     </div>
   );
 };

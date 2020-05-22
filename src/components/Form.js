@@ -13,15 +13,15 @@ const Form = (props) => {
     return (
         <>
             <h2>Build Your Own Pizza</h2>
-            <div className='order container' onSubmit={onSubmit}>
+            <form className='order container' onSubmit={onSubmit}>
                 <h3>Bulid Your Own Pizza</h3>
                 <label>Name:&nbsp;
                     <input
                         type='text'
                         placeholder='name'
                         maxLength='30'
-                        name='name'
-                        value={values.name}
+                        name='first_name'
+                        value={values.first_name}
                         onChange={onInputChange}
                     />
                 </label>  
@@ -77,9 +77,9 @@ const Form = (props) => {
                         onChange={onInputChange}
                     />
                 </label> 
-                <div className='errors'>{errors.name}</div>
-                <button disabled={disabled}>Submit</button>
-            </div>
+                <div className='errors'>{errors.first_name}</div>
+                <button disabled={disabled} className='submit' >Submit</button>
+            </form>
         </>
 
     )
