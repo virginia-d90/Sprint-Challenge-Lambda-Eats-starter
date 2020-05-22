@@ -42,16 +42,16 @@ const App = () => {
   const [formErrors, setFormErrors] = useState(initialFormErrors)
   const [disabled, setDisabled] = useState(initialDisabled)
   
-  const getOrders = () => {
-    axios.get('https://reqres.in/api/users')
-      .then(res => {
-        console.log(res)
-        setOrders(res.data.data)
-      })
-      .catch(err => {
-        console.log(err)  
-      })
-  }
+  // const getOrders = () => {
+  //   axios.get('https://reqres.in/api/users')
+  //     .then(res => {
+  //       console.log(res)
+  //       setOrders(res.data.data)
+  //     })
+  //     .catch(err => {
+  //       console.log(err)  
+  //     })
+  // }
 
   const postNewOrder = newOrder => {
     axios.post('https://reqres.in/api/users', newOrder)
@@ -123,9 +123,9 @@ const App = () => {
     console.log(newOrder)
   }
 
-  useEffect(() => {
-    getOrders()
-  },[])
+  // useEffect(() => {
+  //   getOrders()
+  // },[])
 
 
   useEffect(() => {
@@ -164,7 +164,8 @@ const App = () => {
         orders.map(order =>{
           return (
             <div key={order.id} className='order container'>
-              <h4>{order.first_name}</h4>
+              <h4>{order.first_name} your order has been recieved</h4>
+              
             </div>
           )
         })
